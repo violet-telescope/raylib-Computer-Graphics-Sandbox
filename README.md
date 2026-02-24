@@ -1,5 +1,5 @@
 # raylib Computer Graphics Sandbox
-raylib-Computer-Graphics-Sandbox is an in-progress sandbox application for 3D computer graphics developed for learning purposes and for use in CSC 4750 Computer Graphics at Tennessee Technological University using [raylib](https://www.raylib.com/index.html), its [raygui library](https://github.com/raysan5/raygui), and [cJSON](https://github.com/DaveGamble/cJSON).
+raylib-Computer-Graphics-Sandbox is an in-progress sandbox application for 3D computer graphics developed for learning purposes and for use in CSC 4750 Computer Graphics at Tennessee Technological University written in C using [raylib](https://www.raylib.com/index.html), its [raygui library](https://github.com/raysan5/raygui), and [cJSON](https://github.com/DaveGamble/cJSON).
 ## Compilation and Running the App
 The following instructions are accurate as of February 2026. If something fails, first verify that the instructions are still valid, and if not -- there are plenty of online resources explaining C compilation.
 ### Windows
