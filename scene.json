@@ -1,0 +1,131 @@
+{
+  "Templates": "nothing yet",
+  "Actions": "nothing yet",
+  "Cameras": [
+    {
+        "name": "Camera1",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 1000
+        },
+        "lookat": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "fov": 60.0
+    },
+    {
+      "name": "Camera2",
+        "position": {
+          "x": 400,
+          "y": 400,
+          "z": 400
+        },
+        "lookat": {
+          "x": 300,
+          "y": 200,
+          "z": 5
+        },
+        "fov": 60.0
+    }
+  ],
+  "Lights": "nothing yet",
+  "Objects": [
+    {
+      "type": "CIRCLE",
+      "name": "round thing",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "diameter": 100,
+      "color": "DARKMAGENTA"
+    },
+    {
+      "type": "SQUARE",
+      "name": "BoxOne",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "width": 167.7,
+      "color": "YELLOW"
+    },
+    {
+      "type": "RECTANGLE",
+      "name": "Box2",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "width": 300.0,
+      "height": 150.0,
+      "color": "GREEN"
+    },
+    {
+      "type": "TEXT",
+      "name": "Billboard",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "fontname": "Calibri",
+      "fontfamily": "SWISS",
+      "fontsize": 80,
+      "text": [
+        "This is the text",
+        "that I wish to",
+        "display",
+        "NOW!!!!"
+      ],
+      "color": "BLUE"
+    }
+  ],
+  "Set Up": [
+    {
+      "name": "round thing",
+      "moveto": {
+        "x": 200,
+        "y": 300,
+        "z": 0
+      }
+    },
+    {
+      "name": "BoxOne",
+      "moveto": {
+        "x": 150,
+        "y": 150,
+        "z": 0
+      },
+      "rotateto": {
+      "pitch": 0,
+      "yaw": 0,
+      "roll": 45
+      }
+    },
+    {
+      "name": "Box2",
+      "moveto": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotateto": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 90
+      }
+    },
+    {
+      "name": "Billboard",
+      "moveto": {
+        "x": 100,
+        "y": 300,
+        "z": 0
+      },
+      "rotateto": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 15
+      }
+    }
+  ]
+}
