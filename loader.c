@@ -2,16 +2,36 @@
 
 extern float toRadians;
 
-// possibly a better way to do this, this is just what Claude suggested so I'll use it for now
 Color ColorFromString(const char *str)
 {
-    if (strcmp(str, "DARKMAGENTA") == 0) return (Color){139, 0, 139, 255};
+    if (strcmp(str, "LIGHTGRAY")   == 0) return LIGHTGRAY;
+    if (strcmp(str, "GRAY")        == 0) return GRAY;
+    if (strcmp(str, "DARKGRAY")    == 0) return DARKGRAY;
     if (strcmp(str, "YELLOW")      == 0) return YELLOW;
-    if (strcmp(str, "GREEN")       == 0) return GREEN;
-    if (strcmp(str, "BLUE")        == 0) return BLUE;
+    if (strcmp(str, "GOLD")        == 0) return GOLD;
+    if (strcmp(str, "ORANGE")      == 0) return ORANGE;
+    if (strcmp(str, "PINK")        == 0) return PINK;
     if (strcmp(str, "RED")         == 0) return RED;
+    if (strcmp(str, "MAROON")      == 0) return MAROON;
+    if (strcmp(str, "GREEN")       == 0) return GREEN;
+    if (strcmp(str, "LIME")        == 0) return LIME;
+    if (strcmp(str, "DARKGREEN")   == 0) return DARKGREEN;
+    if (strcmp(str, "SKYBLUE")     == 0) return SKYBLUE;
+    if (strcmp(str, "BLUE")        == 0) return BLUE;
+    if (strcmp(str, "DARKBLUE")    == 0) return DARKBLUE;
+    if (strcmp(str, "PURPLE")      == 0) return PURPLE;
+    if (strcmp(str, "VIOLET")      == 0) return VIOLET;
+    if (strcmp(str, "DARKPURPLE")  == 0) return DARKPURPLE;
+    if (strcmp(str, "BEIGE")       == 0) return BEIGE;
+    if (strcmp(str, "BROWN")       == 0) return BROWN;
+    if (strcmp(str, "DARKBROWN")   == 0) return DARKBROWN;
+
     if (strcmp(str, "WHITE")       == 0) return RAYWHITE;
     if (strcmp(str, "BLACK")       == 0) return BLACK;
+    if (strcmp(str, "BLANK")       == 0) return BLANK; // {0, 0, 0, 0}
+    if (strcmp(str, "MAGENTA")     == 0) return MAGENTA;
+    if (strcmp(str, "DARKMAGENTA") == 0) return (Color){139, 0, 139, 255}; // non-raylib color
+    if (strcmp(str, "RAYWHITE")    == 0) return RAYWHITE;
     // add more as needed
     return MAGENTA; // unless magenta *is* the color, this should make missing colors clear
 }
