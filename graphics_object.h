@@ -28,14 +28,18 @@ typedef struct {
     int isVisible;
 
     // type-specific fields
-    float diameter;         // CIRCLE
-    float width;            // SQUARE, RECTANGLE
-    float height;           // RECTANGLE
-    char fontname[64];     // TEXT
-    char fontfamily[64];   // TEXT
-    int fontsize;           // TEXT
-    char **textLines;       // TEXT -- array of arrays for each line
-    int textLineCount;      // TEXT -- size of array of arrays
+    float diameter;             // CIRCLE
+    float width;                // SQUARE, RECTANGLE
+    float height;               // RECTANGLE
+    char filename[64];          // WAVEFRONT_OBJ
+    float scale;                // WAVEFRONT_OBJ
+    char vertex_exchange[4];    // WAVEFRONT_OBJ -- ???
+    char justification[64];     // WAVEFRONT_OBJ -- ???
+    char fontname[64];          // TEXT
+    char fontfamily[64];        // TEXT
+    int fontsize;               // TEXT
+    char **textLines;           // TEXT -- array of arrays for each line
+    int textLineCount;          // TEXT -- size of array of arrays
 } Object;
 
 typedef struct {
