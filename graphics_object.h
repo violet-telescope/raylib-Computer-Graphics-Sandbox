@@ -11,6 +11,7 @@ typedef enum { // there may be more object types implemented in the orignal, mak
     OBJ_CIRCLE,
     OBJ_SQUARE,
     OBJ_RECTANGLE,
+    OBJ_WAVEFRONT_OBJ,
     OBJ_TEXT
 } ObjectType;
 
