@@ -5,10 +5,97 @@
 
 extern int CONTROLS_WIDTH; // pixel size of controls UI
 
-// TODO: implement personal line drawing using raylib's `DrawPixel` and Bresenham's line algorithm
 void RenderDrawLine(Vector2 a, Vector2 b, Color color)
 {
+    int x0 = (int)a.x;
+    int y0 = (int)a.y;
+    int x1 = (int)b.x;
+    int y1 = (int)b.y;
 
+    if (abs(x1 - x0) > abs(y1 - y0))
+    {
+        RenderDrawLineH(x0, y0, x1, y1, color);
+    }
+    else
+    {
+        RenderDrawLineV(x0, y0, x1, y1, color);
+    }
+}
+
+void RenderDrawLineH(int x0, int y0, int x1, int y1, Color color)
+{
+    // if this line points left, swap the coordinates to make it point right
+    if (x0 > x1)
+    {
+        int tmp = x0;
+        x0 = x1;
+        x1 = tmp;
+
+        tmp = y0;
+        y0 = y1;
+        y1 = tmp;
+    }
+
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    // does this line have positive or negative slope?
+    int dir = (dy < 0) ? -1 : 1;
+    dy *= dir;
+
+    if (dx != 0)
+    {
+        int y = y0;
+        int p = (2 * dy) - dx;
+        for (int i = 0; i < (dx + 1); i++)
+        {
+            DrawPixel(x0 + i, y, color);
+            if (p >= 0)
+            {
+                y += dir;
+                p = p - (2 * dx);
+            }
+            p = p + (2 * dy);
+        }
+    }
+}
+
+void RenderDrawLineV(int x0, int y0, int x1, int y1, Color color)
+{
+    // if this line points left, swap the coordinates to make it point right
+    if (y0 > y1)
+    {
+        int tmp = x0;
+        x0 = x1;
+        x1 = tmp;
+
+        tmp = y0;
+        y0 = y1;
+        y1 = tmp;
+    }
+
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+
+    // does this line have positive or negative slope?
+    int dir = (dx < 0) ? -1 : 1;
+    dx *= dir;
+
+    if (dy != 0)
+    {
+        int x = x0;
+        int p = (2 * dx) - dy;
+        for (int i = 0; i < (dy + 1); i++)
+        {
+            DrawPixel(x, y0 + i, color);
+            if (p >= 0)
+            {
+                x += dir;
+                p = p - (2 * dy);
+            }
+            p = p + (2 * dx);
+        }
+    }
 }
 
 // TODO: update draw calls with new line drawing once implemented
@@ -40,9 +127,9 @@ void DrawAxes(Matrix mvp, int screenWidth, int screenHeight)
 
     DrawCircle((int)originScreen.x, (int)originScreen.y, 5, WHITE);
 
-    if (xVisible) DrawLineV(originScreen, xScreen, RED);
-    if (yVisible) DrawLineV(originScreen, yScreen, GREEN);
-    if (zVisible) DrawLineV(originScreen, zScreen, BLUE);
+    if (xVisible) RenderDrawLine(originScreen, xScreen, RED);
+    if (yVisible) RenderDrawLine(originScreen, yScreen, GREEN);
+    if (zVisible) RenderDrawLine(originScreen, zScreen, BLUE);
 
 }
 
@@ -149,18 +236,18 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             {
                 for (int j = 0; j < vertexCount - 1; j++)
                 {
-                    DrawLineV(screenSpaceVertices[j], screenSpaceVertices[j+1], object->color);
+                    RenderDrawLine(screenSpaceVertices[j], screenSpaceVertices[j+1], object->color);
                 }
-                DrawLineV(screenSpaceVertices[vertexCount-1], screenSpaceVertices[0], object->color);
+                RenderDrawLine(screenSpaceVertices[vertexCount-1], screenSpaceVertices[0], object->color);
                 break;
             }
             case OBJ_SQUARE:
             case OBJ_RECTANGLE:
             {
-                DrawLineV(screenSpaceVertices[0], screenSpaceVertices[1], object->color);
-                DrawLineV(screenSpaceVertices[1], screenSpaceVertices[3], object->color);
-                DrawLineV(screenSpaceVertices[3], screenSpaceVertices[2], object->color);
-                DrawLineV(screenSpaceVertices[2], screenSpaceVertices[0], object->color);
+                RenderDrawLine(screenSpaceVertices[0], screenSpaceVertices[1], object->color);
+                RenderDrawLine(screenSpaceVertices[1], screenSpaceVertices[3], object->color);
+                RenderDrawLine(screenSpaceVertices[3], screenSpaceVertices[2], object->color);
+                RenderDrawLine(screenSpaceVertices[2], screenSpaceVertices[0], object->color);
                 break;
             }
             case OBJ_TEXT: // TODO: implement text rendering (hard!)
