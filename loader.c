@@ -92,6 +92,26 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
             if (!rectangleHeight) continue;
             objectPtr->height = (float)rectangleHeight->valuedouble;
         }
+        else if (strcmp(type, "OBJ_FILE") == 0)
+        {
+            objectPtr->type = OBJ_WAVEFRONT_OBJ;
+
+            cJSON *objFilename = cJSON_GetObjectItemCaseSensitive(object, "filename");
+            if (!objFilename) continue;
+            strncpy(objectPtr->filename, objFilename->valuestring, 63);
+
+            cJSON *objVertexExchange = cJSON_GetObjectItemCaseSensitive(object, "vertex exchange");
+            if (!objVertexExchange) continue;
+            strncpy(objectPtr->vertex_exchange, objVertexExchange->valuestring, 63);
+
+            cJSON *objJustification = cJSON_GetObjectItemCaseSensitive(object, "justification");
+            if (!objJustification) continue;
+            strncpy(objectPtr->justification, objJustification->valuestring, 63);
+
+            cJSON *objScale = cJSON_GetObjectItemCaseSensitive(object, "scale");
+            if (!objScale) continue;
+            objectPtr->scale = (float)objScale->valuedouble;
+        }
         else if (strcmp(type, "TEXT") == 0)
         {
             objectPtr->type = OBJ_TEXT;
