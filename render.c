@@ -220,6 +220,21 @@ void RenderDrawQuadrilateral(Vector2 *vertices, Color color)
     RenderDrawLine(vertices[2], vertices[0], color);
 }
 
+void RenderDrawWaveformObj(MeshObject *meshObj, Vector2 *vertices, Color color)
+{
+   for (int i = 0; i < meshObj->numFaces; i++)
+   {
+        /*
+        RenderDrawLine(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], object->color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], object->color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], object->color);
+        */
+        DrawLineV(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], color);
+        DrawLineV(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
+        DrawLineV(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], color);
+   }
+}
+
 void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes)
 {
     int trueScreenWidth = GetScreenWidth() - CONTROLS_WIDTH;
@@ -289,23 +304,7 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             }
             case OBJ_WAVEFRONT_OBJ:
             {
-                for (int i = 0; i < object->objMesh->numFaces; i++)
-                {
-                    /*
-                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].x-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].y-1], object->color);
-                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].y-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].z-1], object->color);
-                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].z-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].x-1], object->color);
-                    */
-                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].x-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].y-1], object->color);
-                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].y-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].z-1], object->color);
-                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].z-1],
-                        screenSpaceVertices[(int)object->objMesh->faces[i].x-1], object->color);
-                }
+                RenderDrawWaveformObj(object->objMesh, screenSpaceVertices, object->color);
                 break;
             }
             case OBJ_TEXT: // TODO: implement text rendering (hard!)
