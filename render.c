@@ -1,7 +1,8 @@
 #include "render.h"
 #include "graphics_math.h"
 
-#define SCENE_SCALE 1.0f // scales size of objects in world
+#define SCENE_SCALE 1.0f        // scales size of everything in world
+#define WAVEFORM_OBJ_SCALE 6.0f // scales size of OBJ_WAVEFORM_OBJs
 
 extern int CONTROLS_WIDTH; // pixel size of controls UI
 
@@ -186,7 +187,7 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
                 float x = object->objMesh->vertices[i].x;
                 float y = object->objMesh->vertices[i].y;
                 float z = object->objMesh->vertices[i].z;
-                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE);
+                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE * WAVEFORM_OBJ_SCALE);
             }
 
             return vertices;
