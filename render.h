@@ -11,6 +11,7 @@ void RenderDrawLineV(int x0, int y0, int x1, int y1, Color color);
 void DrawAxes(Matrix mvp, int screenWidth, int screenHeight);
 void RenderDrawCircle(Vector2 *vertices, int vertexCount, Color color);
 void RenderDrawQuadrilateral(Vector2 *vertices, Color color);
+void RenderDrawWaveformObj(MeshObject *meshObj, Vector2 *vertices, Color color);
 Vector4 *GetObjectVertices(Object *object, int *vertexCount);
 void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes);
 
