@@ -65,7 +65,7 @@ Matrix MXRotationX(float angle)
     return m;
 }
 
-Matrix MXRotationY(float angle) // Y has yaw in raylib
+Matrix MXRotationY(float angle)
 {
     Matrix m = {0};
 
@@ -79,7 +79,7 @@ Matrix MXRotationY(float angle) // Y has yaw in raylib
     return m;
 }
 
-Matrix MXRotationZ(float angle) // Z has roll in raylib
+Matrix MXRotationZ(float angle)
 {
     Matrix m = {0};
 

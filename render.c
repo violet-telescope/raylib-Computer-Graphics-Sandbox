@@ -221,7 +221,7 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
         );
 
         // R = Z * Y * X 
-        Matrix rotation = MXMultiply(MXRotationZ(object->rotation.roll), MXMultiply(MXRotationY(object->rotation.yaw), MXRotationX(object->rotation.pitch)));
+        Matrix rotation = MXMultiply(MXRotationZ(object->rotation.pitch), MXMultiply(MXRotationY(object->rotation.yaw), MXRotationX(object->rotation.roll)));
         // M = T * R * S (we have no scaling matrix S because we scale on creation of T)
         Matrix model = MXMultiply(translation, rotation);
         // MVP = P * V * M
