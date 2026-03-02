@@ -203,7 +203,16 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
     return NULL;
 }
 
-void DrawQuadrilateral(Vector2 *vertices, Color color)
+void RenderDrawCircle(Vector2 *vertices, int vertexCount, Color color)
+{
+    for (int j = 0; j < vertexCount - 1; j++)
+    {
+        RenderDrawLine(vertices[j], vertices[j+1], color);
+    }
+    RenderDrawLine(vertices[vertexCount-1], vertices[0], color);
+}
+
+void RenderDrawQuadrilateral(Vector2 *vertices, Color color)
 {
     RenderDrawLine(vertices[0], vertices[1], color);
     RenderDrawLine(vertices[1], vertices[3], color);
@@ -269,17 +278,13 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
         switch (object->type) {
             case OBJ_CIRCLE:
             {
-                for (int j = 0; j < vertexCount - 1; j++)
-                {
-                    RenderDrawLine(screenSpaceVertices[j], screenSpaceVertices[j+1], object->color);
-                }
-                RenderDrawLine(screenSpaceVertices[vertexCount-1], screenSpaceVertices[0], object->color);
+                RenderDrawCircle(screenSpaceVertices, vertexCount, object->color);
                 break;
             }
             case OBJ_SQUARE:
             case OBJ_RECTANGLE:
             {
-                DrawQuadrilateral(screenSpaceVertices, object->color);
+                RenderDrawQuadrilateral(screenSpaceVertices, object->color);
                 break;
             }
             case OBJ_WAVEFRONT_OBJ:
