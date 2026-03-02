@@ -1,6 +1,31 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "loader.h"
+#include "graphics_object.h"
 
 extern float toRadians;
+
+VertexExchange GetVertexExchange(char* exchange)
+{
+	if (exchange == "XZY") return XZY;
+	if (exchange == "YXZ") return YXZ;
+	if (exchange == "YZX") return YZX;
+	if (exchange == "ZXY") return ZXY;
+	if (exchange == "ZYX") return ZYX;
+	return XYZ;
+}
+
+ImageJustify GetJustification(char* justification)
+{
+	if (justification == "FLIP_IMAGE")          return FLIP_IMAGE;
+	if (justification == "CENTER_IMAGE")        return CENTER_IMAGE;
+	if (justification == "CENTER_FLIP_IMAGE")   return CENTER_FLIP_IMAGE;
+	if (justification == "BOTTOM_IMAGE")        return BOTTOM_IMAGE;
+	if (justification == "BOTTOM_FLIP_IMAGE")   return BOTTOM_FLIP_IMAGE;
+	if (justification == "TOP_IMAGE")           return TOP_IMAGE;
+	if (justification == "TOP_FLIP_IMAGE")      return TOP_FLIP_IMAGE;
+	return NOTHING;
+}
 
 Color ColorFromString(const char *str)
 {
@@ -36,6 +61,117 @@ Color ColorFromString(const char *str)
     return MAGENTA; // unless magenta *is* the color, this should make missing colors clear
 }
 
+MeshObject *OBJFileToMesh(char* filename)
+{
+    int numVertices = 0;
+    int numFaces = 0;
+
+    FILE *file;
+    file = fopen(filename, "r");
+    char line[1024];
+
+    if (file == NULL)
+    {
+        printf("%s failed to open.\n", filename);
+        fclose(file);
+        return NULL;
+    }
+    else
+    {
+        printf("Opened %s\n", filename);
+        while (fgets(line, sizeof(line), file) != NULL)
+        {
+            if (line[0] == 'v' && line[1] == ' ') numVertices++;
+            if (line[0] == 'f') numFaces++; 
+        }
+        rewind(file);
+
+        MeshObject *newMesh = calloc(1, sizeof(MeshObject));
+        newMesh->vertices = calloc(numVertices, sizeof(Vector3));
+        newMesh->faces = calloc(numFaces * 2, sizeof(Vector3)); // * 2 for quads
+
+        numVertices = 0;
+        numFaces = 0;
+
+        while (fgets(line, sizeof(line), file) != NULL) // while(getline(&line, &size, file) != -1)
+        {
+            line[strcspn(line, "\n")] = '\0'; // remove newline
+
+            // split line into parts
+            char **split = calloc(64, sizeof(char *));
+            int numSplits = 0;
+
+            char *token = strtok(line, " \t\n");
+            while (token != NULL)
+            {
+                split[numSplits++] = token;
+                token = strtok(NULL, " \t\n");
+            }
+            split[numSplits] = NULL;
+
+            if (split[0] == NULL)
+            {
+                free(split);
+                continue;
+            }
+
+            if (strcmp(split[0], "v") == 0)        // vector data
+            {
+                Vector3 newVector = { strtof(split[1], NULL), strtof(split[2], NULL), strtof(split[3], NULL) };
+                newMesh->vertices[numVertices] = newVector;
+                numVertices++;
+            }
+            else if (strcmp(split[0], "f") == 0)   // face data
+            {
+                float *faceVertices = calloc(numSplits-1, sizeof(float));
+                for (int i = 1; i < numSplits; i++)
+                {
+                    char *slash = strchr(split[i], '/');
+                    int length = slash - split[i];
+                    char token[64];
+                    strncpy(token, split[i], length);
+                    token[length] = '\0';
+
+                    faceVertices[i-1] = strtof(token, NULL);
+                }
+                
+                if (numSplits == 4)         // 3 vertices, 1 triangle (1 face)
+                {
+                    Vector3 newFace = { faceVertices[0], faceVertices[1], faceVertices[2] };
+                    newMesh->faces[numFaces] = newFace;
+                    numFaces++;
+                }
+                else if (numSplits == 5)    // 4 vertices, 2 triangles (2 faces)
+                {
+                    Vector3 newFaceOne = { faceVertices[0], faceVertices[1], faceVertices[2] };
+                    newMesh->faces[numFaces] = newFaceOne;
+                    numFaces++;
+                    Vector3 newFaceTwo = { faceVertices[1], faceVertices[2], faceVertices[3] };
+                    newMesh->faces[numFaces] = newFaceTwo;
+                    numFaces++;
+                }
+                free(faceVertices);
+            }
+            else if (strcmp(split[0], "o") == 0  || (strcmp(split[0], "g") == 0))
+            {
+                // TODO: implement groups
+                continue;
+            }
+            else
+            {
+                continue;
+            }
+
+            free(split);
+        }
+        fclose(file);
+
+        newMesh->numVertices = numVertices;
+        newMesh->numFaces = numFaces;
+        return newMesh; 
+    }
+}
+
 Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetUp)
 {
     int objectCount = cJSON_GetArraySize(jsonObjects);
@@ -48,6 +184,7 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
     {
         Object *objectPtr = &objects[i++];
 
+        // type-agnostic fields
         cJSON *itemType = cJSON_GetObjectItemCaseSensitive(object, "type");
         if (!itemType) continue;
         const char *type = itemType->valuestring;
@@ -64,6 +201,7 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
             objectPtr->color = WHITE;
         }
 
+        // type-specific fields
         if (strcmp(type, "CIRCLE") == 0)
         {
             objectPtr->type = OBJ_CIRCLE;
@@ -102,15 +240,17 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
 
             cJSON *objVertexExchange = cJSON_GetObjectItemCaseSensitive(object, "vertex exchange");
             if (!objVertexExchange) continue;
-            strncpy(objectPtr->vertex_exchange, objVertexExchange->valuestring, 63);
+            objectPtr->vertexExchange = GetVertexExchange(objVertexExchange->valuestring);
 
             cJSON *objJustification = cJSON_GetObjectItemCaseSensitive(object, "justification");
             if (!objJustification) continue;
-            strncpy(objectPtr->justification, objJustification->valuestring, 63);
+            objectPtr->justification = GetJustification(objJustification->valuestring);
 
             cJSON *objScale = cJSON_GetObjectItemCaseSensitive(object, "scale");
             if (!objScale) continue;
-            objectPtr->scale = (float)objScale->valuedouble;
+            objectPtr->objScale = (float)objScale->valuedouble;
+
+            objectPtr->objMesh = OBJFileToMesh(objectPtr->filename);
         }
         else if (strcmp(type, "TEXT") == 0)
         {

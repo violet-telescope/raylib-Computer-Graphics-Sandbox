@@ -21,7 +21,7 @@ const int CONTROLS_WIDTH = 350; // how wide the GUI section on the right side sh
 int main(void)
 {
     // Initialize
-    // SetTraceLogLevel(LOG_WARNING);
+    SetTraceLogLevel(LOG_WARNING);
     InitWindow(1600, 1200, "raylib sandbox");
 
     float targetFPS = 60.0f;

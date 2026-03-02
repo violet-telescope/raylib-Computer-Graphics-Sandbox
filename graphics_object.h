@@ -7,11 +7,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef enum { // there may be more object types implemented in the orignal, make sure to go back and check
+typedef enum {
     OBJ_CIRCLE,
     OBJ_SQUARE,
     OBJ_RECTANGLE,
     OBJ_WAVEFRONT_OBJ,
+    OBJ_FRACTAL,
     OBJ_TEXT
 } ObjectType;
 
@@ -19,27 +20,70 @@ typedef struct {
     float pitch, yaw, roll;
 } Rotation;
 
+typedef enum {
+	NOTHING             = 0,
+	FLIP_IMAGE          = 1, // flip vertically
+	CENTER_IMAGE        = 2, // center the image at 0,0,0
+	CENTER_FLIP_IMAGE   = 3, // center the image at 0,0,0 and flip
+	BOTTOM_IMAGE        = 4, // center the bottom of the image at 0,0,0
+	BOTTOM_FLIP_IMAGE   = 5, // center the bottom of the image at 0,0,0 and flip
+	TOP_IMAGE           = 6, // center the top of the image at 0,0,0
+	TOP_FLIP_IMAGE      = 7  // center the top of the image at 0,0,0 and flip
+} ImageJustify;
+
+typedef enum {
+	XYZ = 0,
+	XZY = 1,
+	YXZ = 2,
+	YZX = 3,
+	ZXY = 4,
+	ZYX = 5
+} VertexExchange;
+
 typedef struct {
-    ObjectType type;
+    Vector3 *vertices;
+    int numVertices;
+    Color *vertexColors;
+    Vector3 *faces;
+    int numFaces;
+    
+} MeshObject;
+
+typedef struct {
+    // type-agnostic fields
     char name[64];
+    ObjectType type;
+    Color color;
     Vector3 position;
     Rotation rotation;
-    Color color;
     int isVisible;
 
     // type-specific fields
-    float diameter;             // CIRCLE
-    float width;                // SQUARE, RECTANGLE
-    float height;               // RECTANGLE
-    char filename[64];          // WAVEFRONT_OBJ
-    float scale;                // WAVEFRONT_OBJ
-    char vertex_exchange[4];    // WAVEFRONT_OBJ -- ???
-    char justification[64];     // WAVEFRONT_OBJ -- ???
-    char fontname[64];          // TEXT
-    char fontfamily[64];        // TEXT
-    int fontsize;               // TEXT
-    char **textLines;           // TEXT -- array of arrays for each line
-    int textLineCount;          // TEXT -- size of array of arrays
+    float diameter;                     // CIRCLE
+    float width;                        // SQUARE, RECTANGLE
+    float height;                       // RECTANGLE
+
+    // WAVEFRONT_OBJ
+    char filename[64];          
+    float objScale;    
+    VertexExchange vertexExchange;      // ???
+    ImageJustify justification;         // ???
+    MeshObject *objMesh;
+
+    // FRACTAL
+    // char fractalType[64];       
+    // int iterations;
+    // bool isSeeded;                   // 1 = seeded, 0 = random
+    // int seed;
+    // Vector3 boundingBox; // scale
+    // color_125...1000
+
+    // TEXT
+    char fontname[64];
+    char fontfamily[64];
+    int fontsize;
+    char **textLines;                   // array of arrays for each line
+    int textLineCount;                  // size of array of arrays
 } Object;
 
 typedef struct {

@@ -176,6 +176,21 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
 
             return vertices;
         }
+        case OBJ_WAVEFRONT_OBJ:
+        {
+            *vertexCount = object->objMesh->numVertices;
+            Vector4 *vertices = calloc(*vertexCount, sizeof(Vector4));
+
+            for (int i = 0; i < *vertexCount; i++)
+            {
+                float x = object->objMesh->vertices[i].x;
+                float y = object->objMesh->vertices[i].y;
+                float z = object->objMesh->vertices[i].z;
+                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE);
+            }
+
+            return vertices;
+        }
         case OBJ_TEXT:
             // TODO: implement text rendering (hard!)
             break;
@@ -218,11 +233,17 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
         if (!vertices) continue;
         Vector2 *screenSpaceVertices = calloc(vertexCount, sizeof(Vector2));
 
+        bool behindCamera = false;
         for (int j = 0; j < vertexCount; j++)
         {
             Vector4 vertex = vertices[j];
             // vertex_clip-space = P * V * M * vertex
             vertex = Vector4Transform(vertex, modelViewProjection); 
+            if (vertex.w <= 0.0f)
+            {
+                behindCamera = true;
+                break;
+            }
             // vertex_NDC = { vertex_clip-space.x / vertex_clip-space.w,
             //                vertex_clip-space.y / vertex_clip-space.w,
             //                vertex_clip-space.z / vertex_clip-space.w,
@@ -230,6 +251,13 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             vertex = Vector4PerspectiveDivide(vertex);
             screenSpaceVertices[j] = ViewportTransform(vertex, trueScreenWidth, GetScreenHeight());
         }
+        
+        if (behindCamera)
+        {
+            free(vertices);
+            free(screenSpaceVertices);
+            continue;
+        }            
 
         switch (object->type) {
             case OBJ_CIRCLE:
@@ -248,6 +276,15 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
                 RenderDrawLine(screenSpaceVertices[1], screenSpaceVertices[3], object->color);
                 RenderDrawLine(screenSpaceVertices[3], screenSpaceVertices[2], object->color);
                 RenderDrawLine(screenSpaceVertices[2], screenSpaceVertices[0], object->color);
+                break;
+            }
+            case OBJ_WAVEFRONT_OBJ:
+            {
+                for (int i = 0; i < object->objMesh->numVertices; i++)
+                {
+                    // printf("hello I'm about to call RenderDrawLine");
+                    RenderDrawLine(screenSpaceVertices[i], screenSpaceVertices[i+1], object->color);
+                }
                 break;
             }
             case OBJ_TEXT: // TODO: implement text rendering (hard!)

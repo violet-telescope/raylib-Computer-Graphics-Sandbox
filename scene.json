@@ -77,6 +77,24 @@
         "NOW!!!!"
       ],
       "color": "BLUE"
+    },
+    {
+      "name": "t38",
+      "type": "OBJ_FILE",
+      "filename": "Files/obj/t38.obj",
+      "color": "WHITE",
+      "vertex exchange": "ZYX",
+      "justification": "CENTER_IMAGE",
+      "scale": 40.0
+    },
+    {
+      "name": "knight",
+      "type": "OBJ_FILE",
+      "filename": "Files/obj/ChessKnight.obj",
+      "color": "BLUE",
+      "vertex exchange": "XZY",
+      "justification": "BOTTOM_IMAGE",
+      "scale": 25.0
     }
   ],
   "Set Up": [
