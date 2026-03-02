@@ -203,6 +203,14 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
     return NULL;
 }
 
+void DrawQuadrilateral(Vector2 *vertices, Color color)
+{
+    RenderDrawLine(vertices[0], vertices[1], color);
+    RenderDrawLine(vertices[1], vertices[3], color);
+    RenderDrawLine(vertices[3], vertices[2], color);
+    RenderDrawLine(vertices[2], vertices[0], color);
+}
+
 void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes)
 {
     int trueScreenWidth = GetScreenWidth() - CONTROLS_WIDTH;
@@ -271,10 +279,7 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             case OBJ_SQUARE:
             case OBJ_RECTANGLE:
             {
-                RenderDrawLine(screenSpaceVertices[0], screenSpaceVertices[1], object->color);
-                RenderDrawLine(screenSpaceVertices[1], screenSpaceVertices[3], object->color);
-                RenderDrawLine(screenSpaceVertices[3], screenSpaceVertices[2], object->color);
-                RenderDrawLine(screenSpaceVertices[2], screenSpaceVertices[0], object->color);
+                DrawQuadrilateral(screenSpaceVertices, object->color);
                 break;
             }
             case OBJ_WAVEFRONT_OBJ:
