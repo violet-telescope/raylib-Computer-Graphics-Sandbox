@@ -107,20 +107,6 @@ int main(void)
 
                 GuiUnlock(); // dropdowns must be drawn on top of the UI as to not disturb elements underneath them
 
-                char objectDropdownText[512] = {0};
-                for (int i = 0; i < numObjects; i++)
-                {
-                    strcat(objectDropdownText, objects[i].name);
-                    if (i < numObjects - 1)
-                    {
-                        strcat(objectDropdownText, ";");
-                    }
-                }
-                if (GuiDropdownBox((Rectangle){(controlsXPosition+80), 270+scrollOffset.y, 200, 40}, objectDropdownText, &objectDropdownActive, objectDropdownEditMode))
-                {
-                    objectDropdownEditMode = !objectDropdownEditMode;
-                }
-
                 char cameraDropdownText[512] = {0};
                 for (int i = 0; i < numCameras; i++)
                 {
@@ -133,6 +119,19 @@ int main(void)
                 if (GuiDropdownBox((Rectangle){(controlsXPosition+80), 520+scrollOffset.y, 200, 40}, cameraDropdownText, &cameraDropdownActive, cameraDropdownEditMode))
                 {
                     cameraDropdownEditMode = !cameraDropdownEditMode;
+                }
+                char objectDropdownText[512] = {0};
+                for (int i = 0; i < numObjects; i++)
+                {
+                    strcat(objectDropdownText, objects[i].name);
+                    if (i < numObjects - 1)
+                    {
+                        strcat(objectDropdownText, ";");
+                    }
+                }
+                if (GuiDropdownBox((Rectangle){(controlsXPosition+80), 270+scrollOffset.y, 200, 40}, objectDropdownText, &objectDropdownActive, objectDropdownEditMode))
+                {
+                    objectDropdownEditMode = !objectDropdownEditMode;
                 }
             EndScissorMode();
         EndDrawing();
