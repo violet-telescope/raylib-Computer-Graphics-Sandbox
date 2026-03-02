@@ -279,9 +279,22 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             }
             case OBJ_WAVEFRONT_OBJ:
             {
-                for (int i = 0; i < object->objMesh->numVertices; i++)
+                for (int i = 0; i < object->objMesh->numFaces; i++)
                 {
-                    RenderDrawLine(screenSpaceVertices[i], screenSpaceVertices[i+1], object->color);
+                    /*
+                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].x-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].y-1], object->color);
+                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].y-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].z-1], object->color);
+                    RenderDrawLine(screenSpaceVertices[(int)object->objMesh->faces[i].z-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].x-1], object->color);
+                    */
+                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].x-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].y-1], object->color);
+                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].y-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].z-1], object->color);
+                    DrawLineV(screenSpaceVertices[(int)object->objMesh->faces[i].z-1],
+                        screenSpaceVertices[(int)object->objMesh->faces[i].x-1], object->color);
                 }
                 break;
             }
