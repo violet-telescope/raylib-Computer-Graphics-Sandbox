@@ -225,9 +225,9 @@ void RenderDrawWaveformObj(MeshObject *meshObj, Vector2 *vertices, Color color)
    for (int i = 0; i < meshObj->numFaces; i++)
    {
         /*
-        RenderDrawLine(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], object->color);
-        RenderDrawLine(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], object->color);
-        RenderDrawLine(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], object->color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], color);
         */
         DrawLineV(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], color);
         DrawLineV(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
