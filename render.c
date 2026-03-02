@@ -99,7 +99,6 @@ void RenderDrawLineV(int x0, int y0, int x1, int y1, Color color)
     }
 }
 
-// TODO: update draw calls with new line drawing once implemented
 void DrawAxes(Matrix mvp, int screenWidth, int screenHeight)
 {
     Vector4 origin = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -204,7 +203,6 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
     return NULL;
 }
 
-// TODO: update draw calls with new line drawing once implemented
 void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes)
 {
     int trueScreenWidth = GetScreenWidth() - CONTROLS_WIDTH;
@@ -283,7 +281,6 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             {
                 for (int i = 0; i < object->objMesh->numVertices; i++)
                 {
-                    // printf("hello I'm about to call RenderDrawLine");
                     RenderDrawLine(screenSpaceVertices[i], screenSpaceVertices[i+1], object->color);
                 }
                 break;
