@@ -220,6 +220,7 @@ void RenderDrawQuadrilateral(Vector2 *vertices, Color color)
     RenderDrawLine(vertices[2], vertices[0], color);
 }
 
+// using DrawLineV for now -- it saves some computation time and high-poly objects are *really* laggy
 void RenderDrawWaveformObj(MeshObject *meshObj, Vector2 *vertices, Color color)
 {
    for (int i = 0; i < meshObj->numFaces; i++)
