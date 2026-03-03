@@ -1,6 +1,5 @@
 /******************************************************************************
     raylib Computer Graphics Sandbox
-    last updated 2026-03-01
     using raylib, raygui, and cJSON
 
     built for the purpose of understanding computer graphics at a
