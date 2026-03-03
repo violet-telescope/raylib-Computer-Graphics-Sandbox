@@ -186,7 +186,7 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
                 float x = object->objMesh->vertices[i].x;
                 float y = object->objMesh->vertices[i].y;
                 float z = object->objMesh->vertices[i].z;
-                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE * WAVEFORM_OBJ_SCALE);
+                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE * object->objScale); // * WAVEFORM_OBJ_SCALE
             }
 
             return vertices;
