@@ -23,6 +23,8 @@ int main(void)
     SetTraceLogLevel(LOG_WARNING);
     InitWindow(1600, 1200, "raylib sandbox");
 
+    srand(time(NULL));
+
     float targetFPS = 60.0f;
     SetTargetFPS(targetFPS);
 

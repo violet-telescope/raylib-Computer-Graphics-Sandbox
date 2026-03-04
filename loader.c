@@ -172,6 +172,33 @@ MeshObject *OBJFileToMesh(char* filename)
     }
 }
 
+MeshObject *BuildFractalMountain(Object *fractal)
+{
+    MeshObject *newMountainMesh;
+
+    Vertex triTwo[3] = {
+        fractal->baseVertices[(int)fractal->baseIndex[0].x],
+        fractal->baseVertices[(int)fractal->baseIndex[0].y],
+        fractal->baseVertices[(int)fractal->baseIndex[0].z]
+    };
+    Vertex triTwo[3] = {
+        fractal->baseVertices[(int)fractal->baseIndex[1].x],
+        fractal->baseVertices[(int)fractal->baseIndex[1].y],
+        fractal->baseVertices[(int)fractal->baseIndex[1].z]
+    };
+
+    int triCount = 2;
+    for (int i = 0; i < fractal->iterations; i++)
+    {
+        for (int j = 0; j < triCount; j++)
+        {
+
+        }
+    }
+
+    return newMountainMesh;
+}
+
 Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetUp)
 {
     int objectCount = cJSON_GetArraySize(jsonObjects);
@@ -197,7 +224,9 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
         if (itemColor)
         {
             objectPtr->color = ColorFromString(itemColor->valuestring);
-        } else {
+        }
+        else
+        {
             objectPtr->color = WHITE;
         }
 
@@ -251,6 +280,112 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
             objectPtr->objScale = (float)objScale->valuedouble;
 
             objectPtr->objMesh = OBJFileToMesh(objectPtr->filename);
+        }
+        else if (strcmp(type, "FRACTAL") == 0)
+        {
+            objectPtr->type = OBJ_FRACTAL;
+
+            cJSON *fractalType = cJSON_GetObjectItemCaseSensitive(object, "fractal type");
+            if (!fractalType) continue;
+            strncpy(objectPtr->fractalType, fractalType->valuestring, 63);
+
+            cJSON *fractalIterations = cJSON_GetObjectItemCaseSensitive(object, "iterations");
+            if (!fractalIterations) continue;
+            objectPtr->iterations = (float)fractalIterations->valuedouble;
+
+            cJSON *fractalIsSeeded = cJSON_GetObjectItemCaseSensitive(object, "seed");
+            if (!fractalIsSeeded) continue;
+            if (strcmp(fractalIsSeeded, "random") == 0)
+            {
+                objectPtr->isSeeded = false;
+                objectPtr->seed = (int)rand();
+            }
+            else
+            {
+                objectPtr->isSeeded = true;
+                objectPtr->seed = (int)fractalIsSeeded->valueint;
+            }
+
+            cJSON *fractalScale = cJSON_GetObjectItemCaseSensitive(object, "scale");
+            if (fractalScale)
+            {
+                cJSON *scaleX = cJSON_GetObjectItemCaseSensitive(fractalScale, "x");
+                if (!scaleX) continue;
+                objectPtr->scale.x = (float)scaleX->valueint;
+
+                cJSON *scaleY = cJSON_GetObjectItemCaseSensitive(fractalScale, "y");
+                if (!scaleY) continue;
+                objectPtr->scale.y = (float)scaleY->valueint;
+
+                cJSON *scaleZ = cJSON_GetObjectItemCaseSensitive(fractalScale, "Z");
+                if (!scaleZ) continue;
+                objectPtr->scale.z = (float)scaleZ->valueint;
+            }
+            else
+            {
+                objectPtr->scale.x = 500;
+                objectPtr->scale.y = 500;
+                objectPtr->scale.z = 500;
+            }
+
+            cJSON *fractalBaseVertex = cJSON_GetObjectItemCaseSensitive(object, "base_vertex");
+            if (fractalBaseVertex)
+            {
+                cJSON *baseVertex = NULL;
+                int j = 0;
+                cJSON_ArrayForEach(baseVertex, fractalBaseVertex)
+                {
+                    cJSON *vertexX = cJSON_GetObjectItemCaseSensitive(baseVertex, "x");
+                    if (!vertexX) continue;
+                    objectPtr->baseVertices[j].vector.x = (float)vertexX->valuedouble;
+
+                    cJSON *vertexY = cJSON_GetObjectItemCaseSensitive(baseVertex, "y");
+                    if (!vertexY) continue;
+                    objectPtr->baseVertices[j].vector.y = (float)vertexY->valuedouble;
+
+                    cJSON *vertexZ = cJSON_GetObjectItemCaseSensitive(baseVertex, "z");
+                    if (!vertexZ) continue;
+                    objectPtr->baseVertices[j].vector.z = (float)vertexZ->valuedouble;
+
+                    cJSON *vertexColor = cJSON_GetObjectItemCaseSensitive(baseVertex, "c");
+                    if (vertexColor)
+                    {
+                        objectPtr->baseVertices[j].color = ColorFromString(vertexColor->valuestring);
+                    }
+                    else
+                    {
+                        objectPtr->baseVertices[j].color = WHITE;
+                    }
+
+                    j++;
+                }
+            }
+
+            cJSON *fractalBaseIndex = cJSON_GetObjectItemCaseSensitive(object, "base_index");
+            if (fractalBaseIndex)
+            {
+                cJSON *baseIndex = NULL;
+                int j = 0;
+                cJSON_ArrayForEach(baseIndex, fractalBaseIndex)
+                {
+                    cJSON *vertex0 = cJSON_GetObjectItemCaseSensitive(baseIndex, "0");
+                    if (!vertex0) continue;
+                    objectPtr->baseIndex[j].x = (int)vertex0->valueint;
+
+                    cJSON *vertex1 = cJSON_GetObjectItemCaseSensitive(baseIndex, "1");
+                    if (!vertex1) continue;
+                    objectPtr->baseIndex[j].y = (int)vertex1->valueint;
+
+                    cJSON *vertex2 = cJSON_GetObjectItemCaseSensitive(baseIndex, "2");
+                    if (!vertex2) continue;
+                    objectPtr->baseIndex[j].z = (int)vertex2->valueint;
+
+                    j++;
+                }
+            }
+
+            MeshObject *mountainMesh = BuildFractalMountain(objectPtr);
+            if (mountainMesh) objectPtr->fractalMesh = mountainMesh;
         }
         else if (strcmp(type, "TEXT") == 0)
         {

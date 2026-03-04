@@ -41,12 +41,17 @@ typedef enum {
 } VertexExchange;
 
 typedef struct {
+    Vector3 vector;
+    Color color;
+} Vertex;
+
+// TODO: reimplement with Vertex struct instead of two separate vertices and vertexColors arrays
+typedef struct {
     Vector3 *vertices;
     int numVertices;
     Color *vertexColors;
     Vector3 *faces;
     int numFaces;
-    
 } MeshObject;
 
 typedef struct {
@@ -66,15 +71,20 @@ typedef struct {
     // WAVEFRONT_OBJ
     char filename[64];          
     float objScale;    
-    VertexExchange vertexExchange;      // ???
-    ImageJustify justification;         // ???
+    VertexExchange vertexExchange;      // swap vertex order for other coord systems (Z up, Y up, etc.)
+    ImageJustify justification;         // adjust vertex positions so object is centered on origin
     MeshObject *objMesh;
 
     // FRACTAL
-    // char fractalType[64];       
-    // int iterations;
-    // bool isSeeded;                   // 1 = seeded, 0 = random
-    // int seed;
+    char fractalType[64];       
+    int iterations;
+    bool isSeeded;                      // 1 = seeded, 0 = random
+    int seed;
+    Vector3 scale;
+    Vertex *vertices;
+    Vertex baseVertices[4];
+    Vector3 baseIndex[2];
+    MeshObject *fractalMesh;
     // Vector3 boundingBox; // scale
     // color_125...1000
 
