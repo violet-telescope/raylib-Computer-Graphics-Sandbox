@@ -85,7 +85,6 @@ typedef struct {
     Vertex baseVertices[4];
     Vector3 baseIndex[2];
     MeshObject *fractalMesh;
-    // Vector3 boundingBox; // scale
     // color_125...1000
 
     // TEXT

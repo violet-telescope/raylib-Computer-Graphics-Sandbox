@@ -174,27 +174,143 @@ MeshObject *OBJFileToMesh(char* filename)
 
 MeshObject *BuildFractalMountain(Object *fractal)
 {
-    MeshObject *newMountainMesh;
+    MeshObject *newMountainMesh = calloc(1, sizeof (MeshObject));
 
-    Vertex triTwo[3] = {
+    Vertex **triangles = calloc(2, sizeof (Vertex *));
+    Vertex **newTriangles = calloc(2, sizeof (Vertex *));
+    int triCount = 2;
+
+    /*
+    for (int i = 0; i < 4; i++)
+    {
+        fractal->baseVertices[i].vector = (Vector3) {
+            fractal->baseVertices[i].vector.x * fractal->scale.x,
+            fractal->baseVertices[i].vector.y * fractal->scale.y,
+            fractal->baseVertices[i].vector.y * fractal->scale.z,
+        }; 
+    }
+    */
+
+    Vertex baseTriangleOne[3] = {
         fractal->baseVertices[(int)fractal->baseIndex[0].x],
         fractal->baseVertices[(int)fractal->baseIndex[0].y],
         fractal->baseVertices[(int)fractal->baseIndex[0].z]
     };
-    Vertex triTwo[3] = {
+    Vertex baseTriangleTwo[3] = {
         fractal->baseVertices[(int)fractal->baseIndex[1].x],
         fractal->baseVertices[(int)fractal->baseIndex[1].y],
         fractal->baseVertices[(int)fractal->baseIndex[1].z]
     };
 
-    int triCount = 2;
+    triangles[0] = baseTriangleOne;
+    triangles[1] = baseTriangleTwo;
+
     for (int i = 0; i < fractal->iterations; i++)
     {
+        newTriangles = realloc(newTriangles, triCount * 4 * sizeof (Vertex *));
+        int newTrianglesAdded = 0;
         for (int j = 0; j < triCount; j++)
         {
+            // find the 3 midpoints of each vertex of each triangle
+            // TODO: calculate and attempt to store in map instead of using compound literal
+            Vertex midpoints[3] = {
+                (Vertex) {
+                    (triangles[j][0].vector.x + triangles[j][1].vector.x) / 2.0f,
+                    (triangles[j][0].vector.y + triangles[j][1].vector.y) / 2.0f,
+                    (triangles[j][0].vector.z + triangles[j][1].vector.z) / 2.0f,
+                    triangles[j][0].color
+                },
+                (Vertex) {
+                    (triangles[j][1].vector.x + triangles[j][2].vector.x) / 2.0f,
+                    (triangles[j][1].vector.y + triangles[j][2].vector.y) / 2.0f,
+                    (triangles[j][1].vector.z + triangles[j][2].vector.z) / 2.0f,
+                    triangles[j][1].color
+                },
+                (Vertex) {
+                    (triangles[j][2].vector.x + triangles[j][0].vector.x) / 2.0f,
+                    (triangles[j][2].vector.y + triangles[j][0].vector.y) / 2.0f,
+                    (triangles[j][2].vector.z + triangles[j][0].vector.z) / 2.0f,
+                    triangles[j][2].color
+                }
+            };
 
+            // randomly raise or lower the y coordinate of the midpoints
+            // multiplying by 2^-i makes each iteration's changes more granular
+            for (int k = 0; k < 3; k++)
+            {
+                midpoints[k].vector.y += (((float)rand() / (float)RAND_MAX) - 0.25f) * powf(2.0f, (float)-i);
+            }
+
+            // build new set of triangles
+            Vertex *newTriangleOne = calloc(3, sizeof(Vertex));     // A, AB, AC
+            newTriangleOne[0] = triangles[j][0];
+            newTriangleOne[1] = midpoints[0];
+            newTriangleOne[2] = midpoints[2];
+
+            Vertex *newTriangleTwo = calloc(3, sizeof(Vertex));     // B, AB, BC
+            newTriangleTwo[0] = triangles[j][1];
+            newTriangleTwo[1] = midpoints[0];
+            newTriangleTwo[2] = midpoints[1];
+
+            Vertex *newTriangleThree = calloc(3, sizeof(Vertex));   // C, BC, CA
+            newTriangleThree[0] = triangles[j][2];
+            newTriangleThree[1] = midpoints[1];
+            newTriangleThree[2] = midpoints[2];
+
+            Vertex *newTriangleFour = calloc(3, sizeof(Vertex));    // AB, BC, CA
+            newTriangleFour[0] = midpoints[0];
+            newTriangleFour[1] = midpoints[1];
+            newTriangleFour[2] = midpoints[2];
+
+            newTriangles[newTrianglesAdded]   = newTriangleOne;
+            newTriangles[newTrianglesAdded+1] = newTriangleTwo;
+            newTriangles[newTrianglesAdded+2] = newTriangleThree;
+            newTriangles[newTrianglesAdded+3] = newTriangleFour;
+            newTrianglesAdded += 4;
+        }
+
+        triCount *= 4;
+        triangles = realloc(triangles, triCount * sizeof (Vertex *));
+        for (int j = 0; j < triCount; j++)
+        {
+            triangles[j] = newTriangles[j];
         }
     }
+
+    for (int i = 0; i < triCount; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            triangles[i][j].vector = (Vector3) {
+                triangles[i][j].vector.x * fractal->scale.x,
+                triangles[i][j].vector.y * fractal->scale.y,
+                triangles[i][j].vector.z * fractal->scale.z
+            };
+        }
+    }
+
+    newMountainMesh->vertices = calloc(3 * triCount, sizeof(Vector3));
+    newMountainMesh->vertexColors = calloc(3 * triCount, sizeof(Color));
+    newMountainMesh->faces = calloc(triCount, sizeof(Vector3));
+    int verticesIn = 0;
+    for (int i = 0; i < triCount; i++)
+    {
+        newMountainMesh->vertices[verticesIn] = triangles[i][0].vector;
+        newMountainMesh->vertexColors[verticesIn] = triangles[i][0].color;
+        verticesIn++;
+
+        newMountainMesh->vertices[verticesIn] = triangles[i][1].vector;
+        newMountainMesh->vertexColors[verticesIn] = triangles[i][1].color;
+        verticesIn++;
+
+        newMountainMesh->vertices[verticesIn] = triangles[i][2].vector;
+        newMountainMesh->vertexColors[verticesIn] = triangles[i][2].color;
+        verticesIn++;
+        
+        newMountainMesh->faces[i] = (Vector3) { (float)verticesIn-2, (float)verticesIn-1, (float)verticesIn };
+    }
+    newMountainMesh->numFaces = triCount;
+    newMountainMesh->numVertices = 3 * triCount;
 
     return newMountainMesh;
 }
@@ -291,11 +407,11 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
 
             cJSON *fractalIterations = cJSON_GetObjectItemCaseSensitive(object, "iterations");
             if (!fractalIterations) continue;
-            objectPtr->iterations = (float)fractalIterations->valuedouble;
+            objectPtr->iterations = (int)fractalIterations->valueint;
 
             cJSON *fractalIsSeeded = cJSON_GetObjectItemCaseSensitive(object, "seed");
             if (!fractalIsSeeded) continue;
-            if (strcmp(fractalIsSeeded, "random") == 0)
+            if (strcmp(fractalIsSeeded->valuestring, "random") == 0)
             {
                 objectPtr->isSeeded = false;
                 objectPtr->seed = (int)rand();
@@ -317,15 +433,15 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
                 if (!scaleY) continue;
                 objectPtr->scale.y = (float)scaleY->valueint;
 
-                cJSON *scaleZ = cJSON_GetObjectItemCaseSensitive(fractalScale, "Z");
+                cJSON *scaleZ = cJSON_GetObjectItemCaseSensitive(fractalScale, "z");
                 if (!scaleZ) continue;
                 objectPtr->scale.z = (float)scaleZ->valueint;
             }
             else
             {
-                objectPtr->scale.x = 500;
-                objectPtr->scale.y = 500;
-                objectPtr->scale.z = 500;
+                objectPtr->scale.x = 500.0f;
+                objectPtr->scale.y = 500.0f;
+                objectPtr->scale.z = 500.0f;
             }
 
             cJSON *fractalBaseVertex = cJSON_GetObjectItemCaseSensitive(object, "base_vertex");
@@ -370,21 +486,22 @@ Object *LoadObjectsFromJSON(cJSON *jsonObjects, int *numObjects, cJSON *jsonSetU
                 {
                     cJSON *vertex0 = cJSON_GetObjectItemCaseSensitive(baseIndex, "0");
                     if (!vertex0) continue;
-                    objectPtr->baseIndex[j].x = (int)vertex0->valueint;
+                    objectPtr->baseIndex[j].x = (float)vertex0->valueint;
 
                     cJSON *vertex1 = cJSON_GetObjectItemCaseSensitive(baseIndex, "1");
                     if (!vertex1) continue;
-                    objectPtr->baseIndex[j].y = (int)vertex1->valueint;
+                    objectPtr->baseIndex[j].y = (float)vertex1->valueint;
 
                     cJSON *vertex2 = cJSON_GetObjectItemCaseSensitive(baseIndex, "2");
                     if (!vertex2) continue;
-                    objectPtr->baseIndex[j].z = (int)vertex2->valueint;
+                    objectPtr->baseIndex[j].z = (float)vertex2->valueint;
 
                     j++;
                 }
             }
 
-            MeshObject *mountainMesh = BuildFractalMountain(objectPtr);
+            Object *tmp = objectPtr;
+            MeshObject *mountainMesh = BuildFractalMountain(tmp);
             if (mountainMesh) objectPtr->fractalMesh = mountainMesh;
         }
         else if (strcmp(type, "TEXT") == 0)

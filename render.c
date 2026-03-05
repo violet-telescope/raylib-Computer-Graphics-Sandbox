@@ -190,6 +190,21 @@ Vector4 *GetObjectVertices(Object *object, int *vertexCount)
 
             return vertices;
         }
+        case OBJ_FRACTAL:
+        {
+            *vertexCount = object->fractalMesh->numVertices;
+            Vector4 *vertices = calloc(*vertexCount, sizeof(Vector4));
+
+            for (int i = 0; i < *vertexCount; i++)
+            {
+                float x = object->fractalMesh->vertices[i].x;
+                float y = object->fractalMesh->vertices[i].y;
+                float z = object->fractalMesh->vertices[i].z;
+                vertices[i] = Vector4Scaling((Vector4){x, y, z, 1.0f}, SCENE_SCALE);
+            }
+
+            return vertices;
+        }
         case OBJ_TEXT:
             // TODO: implement text rendering (hard!)
             break;
@@ -233,6 +248,21 @@ void RenderDrawWaveformObj(MeshObject *meshObj, Vector2 *vertices, Color color)
         DrawLineV(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
         DrawLineV(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], color);
    }
+}
+
+void RenderDrawMeshObj(MeshObject *meshObj, Vector2 *vertices, Color color)
+{
+    for (int i = 0; i < meshObj->numFaces; i++)
+    {
+        /*
+        RenderDrawLine(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
+        RenderDrawLine(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], color);
+        */
+        DrawLineV(vertices[(int)meshObj->faces[i].x-1], vertices[(int)meshObj->faces[i].y-1], color);
+        DrawLineV(vertices[(int)meshObj->faces[i].y-1], vertices[(int)meshObj->faces[i].z-1], color);
+        DrawLineV(vertices[(int)meshObj->faces[i].z-1], vertices[(int)meshObj->faces[i].x-1], color);
+    }
 }
 
 void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes)
@@ -305,6 +335,11 @@ void RenderScene(Object *objects, int numObjects, Camera3D camera, bool drawAxes
             case OBJ_WAVEFRONT_OBJ:
             {
                 RenderDrawWaveformObj(object->objMesh, screenSpaceVertices, object->color);
+                break;
+            }
+            case OBJ_FRACTAL:
+            {
+                RenderDrawMeshObj(object->fractalMesh, screenSpaceVertices, WHITE);
                 break;
             }
             case OBJ_TEXT: // TODO: implement text rendering (hard!)
