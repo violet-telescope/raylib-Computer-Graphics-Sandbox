@@ -97,6 +97,15 @@
       "scale": 25.0
     },
     {
+      "name": "ferris",
+      "type": "OBJ_FILE",
+      "filename": "Files/obj/rustacean-3d.obj",
+      "color": "RED",
+      "vertex exchange": "XZY",
+      "justification": "BOTTOM_IMAGE",
+      "scale": 25.0
+    },
+    {
       "name": "mountain",
       "type": "FRACTAL",
       "fractal type": "mountain",
